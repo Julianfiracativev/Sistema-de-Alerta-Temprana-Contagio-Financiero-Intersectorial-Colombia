@@ -493,7 +493,7 @@ elif pagina == "🔄 Regímenes Markov":
 
 
 elif pagina == "🔗 Contagio MIP":
-    st.title("🔗 Contagio Intersectorial — Matriz Insumo-Producto")
+    st.title("Contagio Intersectorial — Matriz Insumo-Producto")
     st.markdown("Vista organizada del modelo Leontief, dependencias productivas y contagio sectorial.")
 
     # ═══════════════════════════════════════════════════════════════════════
@@ -501,24 +501,25 @@ elif pagina == "🔗 Contagio MIP":
     # ═══════════════════════════════════════════════════════════════════════
     st.markdown("""
     <style>
-    .mip-hero {
-        background: linear-gradient(135deg, #1F4E79, #2E75B6);
-        color: white;
-        padding: 24px 28px;
-        border-radius: 18px;
-        margin-bottom: 18px;
-        box-shadow: 0 4px 14px rgba(0,0,0,.10);
+    .mip-hero-clean {
+        background: #FFFFFF;
+        padding: 10px 0 20px 0;
+        margin-bottom: 10px;
+        border-bottom: 1px solid #E5E7EB;
     }
-    .mip-hero h2 {
-        margin: 0;
-        font-size: 28px;
+    .mip-hero-clean h2 {
+        margin: 0 0 8px 0;
+        font-size: 34px;
         font-weight: 800;
+        color: #0F172A;
+        letter-spacing: -0.4px;
     }
-    .mip-hero p {
-        margin-top: 8px;
-        margin-bottom: 0;
-        font-size: 14px;
-        opacity: .95;
+    .mip-hero-clean p {
+        margin: 0;
+        font-size: 17px;
+        color: #475569;
+        line-height: 1.7;
+        max-width: 980px;
     }
     .mip-card {
         background: white;
@@ -570,11 +571,11 @@ elif pagina == "🔗 Contagio MIP":
     """, unsafe_allow_html=True)
 
     st.markdown("""
-    <div class="mip-hero">
-        <h2>🧮 Modelo Leontief + Red de Contagio Sectorial</h2>
+    <div class="mip-hero-clean">
+        <h2>Modelo Leontief + Red de Contagio Sectorial</h2>
         <p>
-        Esta página concentra el análisis de Matriz Insumo-Producto: dependencias productivas,
-        sectores críticos, multiplicadores y simulación de contagio directo entre sectores.
+        Identifique sectores críticos, vínculos productivos relevantes, efectos multiplicadores
+        y mecanismos de propagación de choques económicos mediante la Matriz Insumo-Producto de Colombia.
         </p>
     </div>
     """, unsafe_allow_html=True)
