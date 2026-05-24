@@ -220,7 +220,7 @@ elif pagina == "📈 Sectores — ICDS / ICDS*":
 
         st.dataframe(
             df_tabla.style
-            .applymap(color_estado, subset=["Estado ICDS", "Estado ICDS*"])
+            .map(color_estado, subset=["Estado ICDS", "Estado ICDS*"])
             .background_gradient(subset=["ICDS", "ICDS*"], cmap="RdYlGn", vmin=0, vmax=1)
             .format({"ICDS": "{:.4f}", "ICDS*": "{:.4f}", "Ajuste MIP": "{:.4f}"}),
             use_container_width=True, height=450,
@@ -491,7 +491,11 @@ elif pagina == "🔄 Regímenes Markov":
         fig_h.update_layout(height=420, margin=dict(l=10, r=10, t=10, b=10))
         st.plotly_chart(fig_h, use_container_width=True)
 
-  
+    st.subheader("Base del modelo")
+    st.dataframe(df_mk, use_container_width=True, height=360)
+
+    st.download_button("Descargar dataset Markov CSV", df_mk.to_csv(index=False).encode("utf-8"),
+                       "dataset_markov_con_alertas.csv", "text/csv")
 
 elif pagina == "🔗 Contagio MIP":
     st.title("🔗 Contagio Intersectorial — Matriz Insumo-Producto")
@@ -570,13 +574,28 @@ elif pagina == "🔗 Contagio MIP":
     </style>
     """, unsafe_allow_html=True)
 
-
+    st.markdown("""
+    <div class="mip-hero">
+        <h2>🧮 Modelo Leontief + Red de Contagio Sectorial</h2>
+        <p>
+        Esta página concentra el análisis de Matriz Insumo-Producto: dependencias productivas,
+        sectores críticos, multiplicadores y simulación de contagio directo entre sectores.
+        </p>
+    </div>
+    """, unsafe_allow_html=True)
 
     # ═══════════════════════════════════════════════════════════════════════
     # CÁLCULOS BASE
     # ═══════════════════════════════════════════════════════════════════════
-    A_off = A.copy()
-    np.fill_diagonal(A_off.values, 0)
+    # Matriz A sin diagonal: uso to_numpy(copy=True) para evitar errores de arrays de solo lectura en Streamlit Cloud
+    A_off_np = A.fillna(0).astype(float).to_numpy(copy=True)
+    np.fill_diagonal(A_off_np, 0)
+
+    A_off = pd.DataFrame(
+        A_off_np,
+        index=A.index,
+        columns=A.columns
+    )
 
     mult_df = pd.DataFrame({
         "ID": MACROS_LIST,
@@ -670,11 +689,12 @@ elif pagina == "🔗 Contagio MIP":
     </div>
     """, unsafe_allow_html=True)
 
-    tab_resumen, tab_red, tab_contagio, tab_mult = st.tabs([
+    tab_resumen, tab_red, tab_contagio, tab_mult, tab_datos = st.tabs([
         "1️⃣ Resumen ejecutivo",
         "2️⃣ Red productiva",
         "3️⃣ Contagio directo",
-        "4️⃣ Multiplicadores"
+        "4️⃣ Multiplicadores",
+        "5️⃣ Datos"
     ])
 
     # ═══════════════════════════════════════════════════════════════════════
@@ -759,7 +779,8 @@ elif pagina == "🔗 Contagio MIP":
             """, unsafe_allow_html=True)
 
         with col_plot:
-            A_np = A.values.copy()
+            # Copia numérica segura para Streamlit Cloud
+            A_np = A.fillna(0).astype(float).to_numpy(copy=True)
             np.fill_diagonal(A_np, 0)
 
             G = nx.DiGraph()
@@ -964,7 +985,45 @@ elif pagina == "🔗 Contagio MIP":
         </div>
         """, unsafe_allow_html=True)
 
-    
+    # ═══════════════════════════════════════════════════════════════════════
+    # TAB 5 — DATOS
+    # ═══════════════════════════════════════════════════════════════════════
+    with tab_datos:
+        st.subheader("📋 Datos usados en la página")
+
+        col_d1, col_d2 = st.columns(2)
+        with col_d1:
+            st.markdown("**Top sectores por criticidad**")
+            st.dataframe(
+                df_criticidad[["ID", "Sector", "Criticidad", "Multiplicador", "Vínculos salida", "Vínculos entrada", "Nivel"]]
+                .style.format({
+                    "Criticidad": "{:.4f}",
+                    "Multiplicador": "{:.4f}",
+                    "Vínculos salida": "{:.4f}",
+                    "Vínculos entrada": "{:.4f}"
+                }),
+                use_container_width=True,
+                hide_index=True,
+                height=360
+            )
+
+        with col_d2:
+            st.markdown("**Top vínculos técnicos A**")
+            st.dataframe(
+                df_pares.style.format({"Coeficiente técnico": "{:.4f}"}),
+                use_container_width=True,
+                hide_index=True,
+                height=360
+            )
+
+        csv_crit = df_criticidad.to_csv(index=False).encode("utf-8")
+        st.download_button(
+            "Descargar criticidad sectorial CSV",
+            csv_crit,
+            "criticidad_sectorial_mip.csv",
+            "text/csv"
+        )
+
 
 elif pagina == "💥 Simulador de choque":
     st.title("💥 Simulador de Choque Sectorial")
