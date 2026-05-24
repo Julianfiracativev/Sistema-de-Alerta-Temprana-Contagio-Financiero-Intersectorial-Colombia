@@ -491,11 +491,6 @@ elif pagina == "🔄 Regímenes Markov":
         fig_h.update_layout(height=420, margin=dict(l=10, r=10, t=10, b=10))
         st.plotly_chart(fig_h, use_container_width=True)
 
-    st.subheader("Base del modelo")
-    st.dataframe(df_mk, use_container_width=True, height=360)
-
-    st.download_button("Descargar dataset Markov CSV", df_mk.to_csv(index=False).encode("utf-8"),
-                       "dataset_markov_con_alertas.csv", "text/csv")
 
 elif pagina == "🔗 Contagio MIP":
     st.title("🔗 Contagio Intersectorial — Matriz Insumo-Producto")
